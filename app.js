@@ -20,8 +20,18 @@ app.use(express.static(path.join(__dirname, "public")));
 
 const routers = require("./routes/defines.default");
 for (let i = 0; i < routers.length; i++) {
-  let router = routers[i];
-  app.use("/" + router.label, require(router.pluginsUrl));
+  let ele = routers[i];
+  let eleExtends = ele.extends;
+
+  if (ele.basic) {
+    let baicRouter = require("./plugins/" + ele.path + "/index");
+    app.use("/" + ele.path, baicRouter.router);
+  }
+
+  for (let m = 0; m < eleExtends.length; m++) {
+    let basicPath = ele.path + "/" + eleExtends[m].path;
+    app.use("/" + basicPath, require("./plugins/" + basicPath));
+  }
 }
 
 // catch 404 and forward to error handler

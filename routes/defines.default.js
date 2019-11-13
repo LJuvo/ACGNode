@@ -1,4 +1,12 @@
 module.exports = [
-  { label: "basic", pluginsUrl: "./plugins/basic" },
-  { label: "upload", pluginsUrl: "./plugins/upload" }
+  {
+    path: "basic",
+    basic: true,
+    extends: [
+      {
+        path: "about",
+        depence: "about"
+      }
+    ]
+  }
 ];

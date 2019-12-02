@@ -1,71 +1,61 @@
-var express = require('express');
+var express = require("express");
 var router = express.Router();
-var db = require('../lib/mysql.lib');
+var commonUtil = require("../lib/util.lib");
+var db = require("../lib/mysql.lib");
 
-/* GET users listing. */
-router.get('/', function(req, res, next) {
-  (async ()=>{
-    let s = await db.FindAll('user', '');
-    console.log(s);
+router.get("/", [commonUtil.jsonHeader], function(req, res, next) {
+  (async () => {
+    var data = { code: 200, path: "Test", message: "获取Test Index信息成功!" };
+    res.json(data);
   })();
-
-  return res.send('respond with a resource');
 });
-/* GET users listing. */
-router.get('/insert', function(req, res, next) {
-  (async ()=>{
-    let s = await db.INSERT('user', {
-      username  : 'Juvos',
-      userpass  : '123456',
-      usertel   : '123555',
-      userwx    : '74516'
-    },'');
-    console.log(s);
-  })();
 
-  return res.send('respond with a resource');
+router.post("/create", [commonUtil.jsonHeader], function(req, res, next) {
+  (async () => {
+    var obj = JSON.parse(JSON.stringify(req.body));
+    for (var k in obj) {
+      obj = k;
+    }
+    obj = JSON.parse(obj);
+
+    var data = {
+      code: 200,
+      messgae: "发布成功!"
+    };
+
+    var demandCode = codeGenerLib.generDemandCode(obj.userCode);
+    while (1) {
+      var flag = await db.FindOne("demand", { demandCode: demandCode });
+      if (commonUtil.isEmpty(flag)) break;
+
+      demandCode = codeGenerLib.generDemandCode(obj.userCode);
+    }
+
+    obj.demandCode = demandCode;
+    obj.createTime = dateLib.getTimeStamp();
+    obj.updateTime = dateLib.getTimeStamp();
+    await db.INSERT("demand", obj, "");
+
+    return res.json(data);
+  })();
 });
-router.get('/update', function(req, res, next) {
-  (async ()=>{
-    let s = await db.UPDATE('user', {
-      username  : 'Juvos',
-      userpass  : '456789',
-      usertel   : '123456',
-      userwx    : '88888'
-    },{
-      username  : 'Juvos' 
-    });
-    console.log(s);
-  })();
 
-  return res.send('respond with a resource');
+router.get("/list", [commonUtil.jsonHeader], async (req, res, next) => {
+  let data = await db.FindAll("user", {}, "createTime", "desc");
+
+  return res.json(data);
 });
-router.get('/del', function(req, res, next) {
-  (async ()=>{
-    let s = await db.DELETE('user', {
-      username  : 'Juvos'
-    });
-    console.log(s);
-  })();
 
-  return res.send('respond with a resource');
-});
-router.get('/page', function(req, res, next) {
-  (async ()=>{
-    let s = await db.PAGE('user','');
-    console.log(s);
+router.get("/list", [commonUtil.jsonHeader], function(req, res, next) {
+  (async () => {
+    var data = {
+      code: 200,
+      path: "Test",
+      message: "获取Test List信息成功!"
+    };
+    console.log(req.baseUrl, req.originalUrl);
+    res.json(data);
   })();
-
-  return res.send('respond with a resource');
-});
-router.get('/page/:pageNum', function(req, res, next) {
-  (async ()=>{
-    console.log(req.params.pageNum);
-    let s = await db.PAGE('user','',req.params.pageNum);
-    console.log(s);
-  })();
-
-  return res.send('respond with a resource');
 });
 
 module.exports = router;

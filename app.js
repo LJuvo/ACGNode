@@ -33,6 +33,7 @@ for (let i = 0; i < routers.length; i++) {
     app.use("/" + basicPath, require("./plugins/" + basicPath));
   }
 }
+app.use("/user", require("./plugins/users"));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

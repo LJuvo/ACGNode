@@ -35,6 +35,7 @@ for (let i = 0; i < routers.length; i++) {
 }
 app.use("/user", require("./plugins/users"));
 app.use("/kite", require("./plugins/kite"));
+app.use("/article", require("./plugins/article"));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
